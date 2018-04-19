@@ -1,0 +1,5 @@
+/data
+/data/train_images/
+/data/val_images/
+/results/
+.DS_Store
