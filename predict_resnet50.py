@@ -8,6 +8,7 @@ from keras.applications.resnet50 import ResNet50
 from keras.models import Sequential, Model
 from keras.layers import Input, Dropout, Flatten, Dense
 from keras.preprocessing import image
+from keras.backend import tensorflow_backend as backend
 import numpy as np
 
 IMG_ROWS, IMG_COLS = 224, 224
@@ -61,6 +62,9 @@ def main():
     result = [(CLASSES[i], pred[i]) for i in top_indices]
     for x in result:
         print(x)
+    
+    backend.clear_session()
 
+ 
 if __name__ == '__main__':
     main()

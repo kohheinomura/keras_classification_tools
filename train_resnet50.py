@@ -4,6 +4,7 @@
 from config import *
 import os
 import time
+import math
 import argparse
 from keras.applications.resnet50 import ResNet50
 from keras.models import Sequential, Model
@@ -105,8 +106,10 @@ def main():
     # 学習実行
     history = model.fit_generator(
         train_generator,
+        steps_per_epoch=math.ceil(train_generator.n/args.batch_size),
         epochs=args.num_epoch,
-        validation_data=validation_generator)
+        validation_data=validation_generator,
+        validation_steps=math.ceil(validation_generator.n/args.batch_size))
 
     # 学習済みモデルとログをsave
     model.save_weights(os.path.join(RESULT_DIR, args.out_file + '.h5'))

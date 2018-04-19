@@ -21,7 +21,7 @@ ResNet50を利用した学習を実行します。学習には以下のpythonス
 実行例：
 
 ```
-python resnet50_classification.py --train-data-dir data/train_images --val-data-dir data/val_images --batch-size 32 --num-epoch 10 --out-file resnet50_classification_out
+python train_resnet50.py --train-data-dir data/train_images --val-data-dir data/val_images --batch-size 32 --num-epoch 10 --out-file resnet50_classification_out
 ```
 
 - --train-data-dir：学習用データのルート・ディレクトリを指定します。ここで指定したディレクトリ直下にconfig.pyで指定したクラス名と同じ名前のディレクトリを作成のうえ画像データを配置します。このオプションを指定しない場合、デフォルトの`data/train_images`が適用されます。
@@ -37,7 +37,7 @@ python resnet50_classification.py --train-data-dir data/train_images --val-data-
 実行例：
 
 ```
-python resnet50_predict.py --restore-from resnet50_classification_out.h5 --target-image ./data/val_images/C1/c1_image_001.bmp
+python predict_resnet50.py --restore-from resnet50_classification_out.h5 --target-image ./data/val_images/C1/c1_image_001.bmp
 ```
 
 - --restore-from：学習済みモデルの重みファイルを指定します。ファイルのパスは、config.pyで指定したRESULT_DIRからの相対パスになります。
@@ -51,7 +51,7 @@ python resnet50_predict.py --restore-from resnet50_classification_out.h5 --targe
 実行例：
 
 ```
-python resnet50_gradcam.py --restore-from resnet50_classification_out.h5 --target-data-dir data/val_images --target-classes C1,L3
+python gradcam_resnet50.py --restore-from resnet50_classification_out.h5 --target-data-dir data/val_images --target-classes C1,L3
 ```
 
 - --restore-from：学習済みモデルの重みファイルを指定します。ファイルのパスは、config.pyで指定したRESULT_DIRからの相対パスになります。
