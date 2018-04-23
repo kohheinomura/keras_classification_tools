@@ -1,3 +1,3 @@
-CLASSES = ['L0','L4','L5','L6','L7']
+CLASSES = ['C1','C2','C3','C4','C5']
 RESULT_DIR = './results'
 IMG_FORMAT = "bmp"

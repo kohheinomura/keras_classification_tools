@@ -11,6 +11,7 @@ from keras.models import Sequential, Model
 from keras.layers import Input, Dropout, Flatten, Dense
 from keras.preprocessing.image import ImageDataGenerator
 from keras import optimizers
+from keras.backend import tensorflow_backend as backend
 
 BATCH_SIZE = 32
 NUM_EPOCH = 100
@@ -118,6 +119,7 @@ def main():
     elapsed_time = time.time() - start
     print("elapsed_time:{0}".format(elapsed_time) + "[sec]")
 
+    backend.clear_session()
 
 if __name__ == '__main__':
     main()
