@@ -58,7 +58,7 @@ ResNet50を利用した学習を実行します。学習には以下のpythonス
 実行例：
 
 ```
-python train_resnet50.py --batch-size 32 --num-epoch 10 --out-file resnet50_classification_out
+$ python train_resnet50.py --batch-size 32 --num-epoch 10 --out-file resnet50_classification_out
 ```
 
 - --batch-size：学習時のバッチサイズを指定します。このオプションを指定しない場合、デフォルトの`32`が適用されます。
@@ -79,7 +79,7 @@ python train_resnet50.py --batch-size 32 --num-epoch 10 --out-file resnet50_clas
 実行例：
 
 ```
-python predict_resnet50.py --restore-from resnet50_classification_out.h5 --target-image ./data/val_images/C1/c1_image_001.bmp
+$ python predict_resnet50.py --restore-from resnet50_classification_out.h5 --target-image ./data/val_images/C1/c1_image_001.bmp
 ```
 
 - --restore-from：学習済みモデルの重みファイルを指定します。ファイルのパスは、config.pyで指定したRESULT_DIRからの相対パスになります。
@@ -93,7 +93,7 @@ python predict_resnet50.py --restore-from resnet50_classification_out.h5 --targe
 実行例：
 
 ```
-python gradcam_resnet50.py --restore-from resnet50_classification_out.h5 --target-data-dir data/val_images --target-classes C1,C3
+$ python gradcam_resnet50.py --restore-from resnet50_classification_out.h5 --target-data-dir data/val_images --target-classes C1,C3
 ```
 
 - --restore-from：学習済みモデルの重みファイルを指定します。ファイルのパスは、config.pyで指定したRESULT_DIRからの相対パスになります。
