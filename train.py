@@ -1,26 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from config import *
 import os
 import time
 import math
 import argparse
-from keras.applications.resnet50 import ResNet50
-from keras.models import Sequential, Model
-from keras.layers import Input, Dropout, Flatten, Dense
 from keras.preprocessing.image import ImageDataGenerator
 from keras import optimizers
 from keras.backend import tensorflow_backend as backend
-
-BATCH_SIZE = 32
-NUM_EPOCH = 100
-OUT_FILE = "resnet50_classification_out"
-TRAIN_DATA_DIR = './data/train_images'
-VALIDATION_DATA_DIR = './data/val_images'
-IMG_ROWS, IMG_COLS = 224, 224
-CHANNELS = 3
-NUM_CLASSES = len(CLASSES)
+from util import get_config, get_model
 
 def save_history(history, result_file):
     loss = history.history['loss']
@@ -35,43 +23,38 @@ def save_history(history, result_file):
             fp.write("%d\t%f\t%f\t%f\t%f\n" % (i, loss[i], acc[i], val_loss[i], val_acc[i]))
 
 def get_arguments():
-    parser = argparse.ArgumentParser(description="ResNet50 Network")
-    parser.add_argument("--train-data-dir", type=str, default=TRAIN_DATA_DIR,
+    parser = argparse.ArgumentParser(description="Train Network")
+    parser.add_argument("--config", type=str, required=True,
+                        help="Specify the config to use")
+    parser.add_argument("--model", type=str,
+                        help="Specify the model to use")
+    parser.add_argument("--train-data-dir", type=str, required=True,
                         help="Place where training data stored")
-    parser.add_argument("--val-data-dir", type=str, default=VALIDATION_DATA_DIR,
+    parser.add_argument("--val-data-dir", type=str, required=True,
                         help="Place where validation data stored")
-    parser.add_argument("--batch-size", type=int, default=BATCH_SIZE,
+    parser.add_argument("--batch-size", type=int, required=True,
                         help="Number of images sent to the network in one step.")
-    parser.add_argument("--num-epoch", type=int, default=NUM_EPOCH,
+    parser.add_argument("--num-epoch", type=int, required=True,
                         help="Number of epoch for training")
-    parser.add_argument("--out-file", type=str, default=OUT_FILE,
-                        help="Number of epoch for training")
+    parser.add_argument("--out-file", type=str, required=True,
+                        help="File which stores model weight")
     return parser.parse_args()
 
-def main():
-    args = get_arguments()
-    # os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+if __name__ == '__main__':
     start = time.time()
+    args = get_arguments()
+    classess, result_dir, format = get_config(args.config)
+    num_classess = len(classess)
 
-    if not os.path.exists(RESULT_DIR):
-        os.mkdir(RESULT_DIR)
+    if not os.path.exists(result_dir):
+        os.mkdir(result_dir)
 
     # 学習済み重みをロード
-    # Fully-connected層（FC）はいらないのでinclude_top=False）
-    input_tensor = Input(shape=(IMG_ROWS, IMG_COLS, CHANNELS))
-    resnet50 = ResNet50(include_top=False, weights='imagenet', input_tensor=input_tensor)
-
-    # FC層を構築
-    top_model = Sequential()
-    top_model.add(Flatten(input_shape=resnet50.output_shape[1:]))
-    top_model.add(Dense(256, activation='relu'))
-    top_model.add(Dropout(0.5))
-    top_model.add(Dense(NUM_CLASSES, activation='softmax'))
-    model = Model(input=resnet50.input, output=top_model(resnet50.output))
+    model, rows, cols, _ = get_model(args.model, num_classess)
 
     # 最後のconv層の直前までの層をfreeze
-    for layer in model.layers[:170]:
-        layer.trainable = True
+    # for layer in model.layers[:15]:
+    #     layer.trainable = True
 
     # モデルのコンパイル。optimizerとしてはSGDを指定
     model.compile(loss='categorical_crossentropy',
@@ -86,9 +69,9 @@ def main():
         horizontal_flip=True)
     train_generator = train_datagen.flow_from_directory(
         args.train_data_dir,
-        target_size=(IMG_ROWS, IMG_COLS),
+        target_size=(rows, cols),
         color_mode='rgb',
-        classes=CLASSES,
+        classes=classess,
         class_mode='categorical',
         batch_size=args.batch_size,
         shuffle=True)
@@ -97,9 +80,9 @@ def main():
     test_datagen = ImageDataGenerator(rescale=1.0 / 255)
     validation_generator = test_datagen.flow_from_directory(
         args.val_data_dir,
-        target_size=(IMG_ROWS, IMG_COLS),
+        target_size=(rows, cols),
         color_mode='rgb',
-        classes=CLASSES,
+        classes=classess,
         class_mode='categorical',
         batch_size=args.batch_size,
         shuffle=True)
@@ -113,13 +96,10 @@ def main():
         validation_steps=math.ceil(validation_generator.n/args.batch_size))
 
     # 学習済みモデルとログをsave
-    model.save_weights(os.path.join(RESULT_DIR, args.out_file + '.h5'))
-    save_history(history, os.path.join(RESULT_DIR, args.out_file + '.txt'))
+    model.save_weights(os.path.join(result_dir, args.out_file + '.h5'))
+    save_history(history, os.path.join(result_dir, args.out_file + '.txt'))
 
     elapsed_time = time.time() - start
     print("elapsed_time:{0}".format(elapsed_time) + "[sec]")
 
     backend.clear_session()
-
-if __name__ == '__main__':
-    main()
