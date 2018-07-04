@@ -1,4 +1,7 @@
- `VGG16`, `ResNet50`, `InceptionV3`を用いたKerasベースの分類、推論、Grad-Cam実装です。
+# Kerasを利用した分類ツール
+
+
+`ResNet50`,  `VGG16`, `InceptionV3`を用いたKerasベースの分類、推論、Grad-Cam実装です。
 必要なソースコードを`git clone`します。
 
 ```

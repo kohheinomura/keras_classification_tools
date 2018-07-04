@@ -6,6 +6,7 @@ import time
 import math
 import argparse
 from keras.preprocessing.image import ImageDataGenerator
+from keras.callbacks import ModelCheckpoint
 from keras import optimizers
 from keras.backend import tensorflow_backend as backend
 from util import get_config, get_model
@@ -88,15 +89,19 @@ if __name__ == '__main__':
         shuffle=True)
 
     # 学習実行
+    cppath = os.path.join(result_dir, args.out_file + '.{epoch:02d}-{val_loss:.2f}-{val_acc:.2f}.h5')
+    cp_cb = ModelCheckpoint(filepath=cppath, monitor='val_loss', verbose=1, save_best_only=True, mode='auto')
+
     history = model.fit_generator(
         train_generator,
         steps_per_epoch=math.ceil(train_generator.n/args.batch_size),
         epochs=args.num_epoch,
         validation_data=validation_generator,
-        validation_steps=math.ceil(validation_generator.n/args.batch_size))
+        validation_steps=math.ceil(validation_generator.n/args.batch_size),
+        callbacks=[cp_cb])
 
     # 学習済みモデルとログをsave
-    model.save_weights(os.path.join(result_dir, args.out_file + '.h5'))
+    # model.save_weights(os.path.join(result_dir, args.out_file + '.h5'))
     save_history(history, os.path.join(result_dir, args.out_file + '.txt'))
 
     elapsed_time = time.time() - start
